@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fictional Apex Racing mark - do not use real F1 team logos -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 48" role="img" aria-label="Apex Racing">
+  <defs>
+    <linearGradient id="apexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d2be"/>
+      <stop offset="100%" stop-color="#007a6e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mark: stylized A / apex chevron in circle -->
+  <circle cx="24" cy="24" r="22" fill="#0b1a1e" stroke="url(#apexGrad)" stroke-width="2"/>
+  <path
+    d="M24 8 L36 34 H30 L27 26 H21 L18 34 H12 Z M22.5 22 H25.5 L24 18 Z"
+    fill="#00d2be"
+  />
+  <path d="M14 38 H34" stroke="#00d2be" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Wordmark -->
+  <text x="56" y="22" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="16" font-weight="700" letter-spacing="3" fill="#e8eef0">APEX</text>
+  <text x="56" y="38" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="11" font-weight="500" letter-spacing="4" fill="#00d2be">RACING</text>
+</svg>
