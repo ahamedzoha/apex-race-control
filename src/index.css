@@ -1,0 +1,58 @@
+@import 'tailwindcss';
+
+/* Design tokens. Colours are named by role, not by hue, so panels never hard-code hex. */
+@theme {
+  --color-ground: #050b0d;
+  --color-panel: #0a1517;
+  --color-raised: #0f1e21;
+  --color-edge: #16302f;
+  --color-edge-strong: #23514d;
+
+  --color-apex: #00d2be;
+  --color-apex-dim: #0d6f66;
+
+  --color-ok: #35d07f;
+  --color-caution: #f2b544;
+  --color-critical: #ff5347;
+  --color-info: #5aa9ff;
+
+  --color-ink: #e8f1f0;
+  --color-ink-dim: #9fb5b3;
+  --color-ink-faint: #62807d;
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+}
+
+/* Telemetry numbers change every tick; tabular figures stop them jittering. */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Small uppercase label used on every panel header. */
+@utility label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-apex);
+    outline-offset: 2px;
+  }
+}
