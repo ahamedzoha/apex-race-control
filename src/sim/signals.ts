@@ -26,11 +26,21 @@ export function drift(
 }
 
 /**
- * Corner centres as a fraction of a lap. Hockenheim is three long straights and a
- * tight stadium section, so the corners are unevenly spaced on purpose.
+ * Corner centres as a fraction of a lap, measured from the racing line in
+ * `data/trackPath.ts`: the path was sampled and the turning angle per unit length
+ * taken, and these are where it peaks. They were hand-authored at first, which put
+ * five of them on straights once the track map was drawn.
  */
-const CORNERS = [0.08, 0.21, 0.34, 0.52, 0.63, 0.71, 0.78, 0.86, 0.94];
-const CORNER_WIDTH = 0.028;
+const CORNERS = [
+  0.0, 0.12, 0.159, 0.389, 0.48, 0.544, 0.587, 0.677, 0.709, 0.754, 0.785, 0.84,
+  0.87, 0.905,
+];
+
+/**
+ * Narrow enough that the closest pair (0.84 and 0.87) still reads as two corners,
+ * wide enough that the stadium section stays loaded between them.
+ */
+const CORNER_WIDTH = 0.018;
 
 /** 0 on a straight, 1 in the middle of a corner. */
 export function corneringAt(lapProgress: number) {

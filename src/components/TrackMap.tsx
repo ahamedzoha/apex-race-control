@@ -64,10 +64,12 @@ export function TrackMap() {
 
         {placed.map((marker) => {
           const isSelected = marker.id === selectedId;
+          // Six cars share the map: three of ours and three rivals. Team cars take
+          // the brand colour so the engineer can pick them out without reading labels.
           const fill = isSelected
             ? "var(--color-apex)"
             : marker.isTeam
-              ? "var(--color-ink-dim)"
+              ? "var(--color-apex-dim)"
               : "var(--color-ink-faint)";
 
           return (
@@ -75,7 +77,12 @@ export function TrackMap() {
               {isSelected ? (
                 <circle r="7" fill="var(--color-apex)" opacity="0.18" />
               ) : null}
-              <circle r={isSelected ? 3.6 : 2.4} fill={fill} />
+              <circle
+                r={isSelected ? 3.6 : marker.isTeam ? 2.8 : 2.2}
+                fill={fill}
+                stroke={marker.isTeam ? "var(--color-apex)" : "none"}
+                strokeWidth={marker.isTeam && !isSelected ? 0.6 : 0}
+              />
               {isSelected ? (
                 <text
                   x="10"
