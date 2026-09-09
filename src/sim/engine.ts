@@ -24,7 +24,19 @@ export const DEFAULT_TICK_MS = 700;
 /** Sim seconds per real second. A lap is around 83s of race time, around 14s on screen. */
 const TIME_SCALE = 6;
 const BASE_LAP_SECONDS = 83;
-const AVERAGE_SPEED_KMH = 212;
+/** Mean speed the corner model actually produces, so a lap lands near BASE_LAP_SECONDS. */
+const AVERAGE_SPEED_KMH = 239;
+
+/**
+ * Motion is integrated in smaller steps than the tick. Speed depends on track
+ * position and position is integrated from speed, so stepping the whole 4.2s tick
+ * at once locks every lap onto a whole number of ticks: all three drivers came out
+ * at exactly 84.000s whatever their pace.
+ */
+const MOTION_SUBSTEPS = 4;
+const SPEED_RESPONSE = 0.34;
+const SPEED_SUBSTEP_RESPONSE =
+  1 - Math.pow(1 - SPEED_RESPONSE, 1 / MOTION_SUBSTEPS);
 const HISTORY_POINTS = 60;
 const EVENT_LIMIT = 40;
 const SESSION_START_SECONDS = 10 * 3600 + 15 * 60;
@@ -65,6 +77,8 @@ type DriverRuntime = {
   style: Style;
   history: DriverHistory;
   latched: Map<string, Severity>;
+  /** Cars join the session mid-lap, so the first wrap is not a timed lap. */
+  hasTimedFullLap: boolean;
 };
 
 /** Cars we do not have telemetry for. They exist so gaps and positions mean something. */
@@ -103,6 +117,7 @@ function buildDriver(entry: (typeof seed.drivers)[number]): DriverRuntime {
     style,
     history: { heartRate: [], breathing: [], stress: [] },
     latched: new Map(),
+    hasTimedFullLap: false,
     telemetry: {
       id: entry.id,
       name: entry.name,
@@ -115,7 +130,9 @@ function buildDriver(entry: (typeof seed.drivers)[number]): DriverRuntime {
       speedKmh: 240,
       topSpeedKmh: base.topSpeedKmh,
       currentLapMs: 0,
-      lastLapMs: null,
+      // The seed gives each driver a best lap, so the session already has history.
+      // Show a plausible last lap alongside it rather than a gap until lap two.
+      lastLapMs: parseLapTime(base.bestLap) + randomBetween(300, 1800),
       bestLapMs: parseLapTime(base.bestLap),
       rpm: base.rpm,
       engineTempC: base.engineTempC,
@@ -234,45 +251,74 @@ export function createRaceEngine(tickMs = DEFAULT_TICK_MS): RaceEngine {
     );
   }
 
+  /** Speed, lap progress, lap timing and fuel burn, stepped MOTION_SUBSTEPS times. */
+  function advanceMotion(runtime: DriverRuntime, dt: number) {
+    const d = runtime.telemetry;
+    const { style } = runtime;
+    const stepSeconds = dt / MOTION_SUBSTEPS;
+    const stepMs = stepSeconds * 1000;
+    let fuelUsed = 0;
+
+    for (let step = 0; step < MOTION_SUBSTEPS; step += 1) {
+      const throttle = throttleAt(d.lapProgress);
+      d.speedKmh = drift(
+        d.speedKmh,
+        (78 + 244 * throttle) * style.pace,
+        SPEED_SUBSTEP_RESPONSE,
+        1.2 / MOTION_SUBSTEPS,
+      );
+      if (d.speedKmh > d.topSpeedKmh) d.topSpeedKmh = d.speedKmh;
+
+      // Lap progress comes out of speed, so lap time is a result of the drive.
+      const progressDelta =
+        (d.speedKmh / AVERAGE_SPEED_KMH) * (stepSeconds / BASE_LAP_SECONDS);
+      const progressBefore = d.lapProgress;
+      d.lapProgress += progressDelta;
+      fuelUsed += style.fuelPerLapPercent * progressDelta;
+
+      if (d.lapProgress < 1) {
+        d.currentLapMs += stepMs;
+        continue;
+      }
+
+      // The line is crossed part way through a step, so interpolate the crossing
+      // and carry the remainder of the step into the next lap.
+      const crossedAt = (1 - progressBefore) / progressDelta;
+      const lapMs = d.currentLapMs + stepMs * crossedAt;
+
+      d.lapProgress -= 1;
+      d.lap += 1;
+
+      if (runtime.hasTimedFullLap) {
+        d.lastLapMs = lapMs;
+        const improved = lapMs < d.bestLapMs;
+        if (improved) d.bestLapMs = lapMs;
+        addEvent(
+          d.id,
+          improved ? "PERSONAL BEST LAP" : "LAP COMPLETED",
+          "info",
+          formatLapDelta(lapMs, d.bestLapMs),
+        );
+      } else {
+        // Started part way through a lap, so timing it would set a nonsense best.
+        runtime.hasTimedFullLap = true;
+        addEvent(d.id, "LAP COMPLETED", "info");
+      }
+
+      d.currentLapMs = stepMs * (1 - crossedAt);
+    }
+
+    d.fuelPercent = clamp(d.fuelPercent - fuelUsed, 0, 100);
+  }
+
   function advanceDriver(runtime: DriverRuntime, dt: number) {
     const d = runtime.telemetry;
     const { style } = runtime;
+
+    advanceMotion(runtime, dt);
+
     const load = corneringAt(d.lapProgress);
     const throttle = throttleAt(d.lapProgress);
-
-    d.speedKmh = drift(
-      d.speedKmh,
-      (78 + 244 * throttle) * style.pace,
-      0.34,
-      1.2,
-    );
-    if (d.speedKmh > d.topSpeedKmh) d.topSpeedKmh = d.speedKmh;
-
-    // Lap progress comes out of speed, so lap time is a result of the drive, not a constant.
-    const progressDelta =
-      (d.speedKmh / AVERAGE_SPEED_KMH) * (dt / BASE_LAP_SECONDS);
-    d.lapProgress += progressDelta;
-    d.currentLapMs += dt * 1000;
-    d.fuelPercent = clamp(
-      d.fuelPercent - style.fuelPerLapPercent * progressDelta,
-      0,
-      100,
-    );
-
-    if (d.lapProgress >= 1) {
-      d.lapProgress -= 1;
-      d.lap += 1;
-      d.lastLapMs = d.currentLapMs;
-      const improved = d.currentLapMs < d.bestLapMs;
-      if (improved) d.bestLapMs = d.currentLapMs;
-      addEvent(
-        d.id,
-        improved ? "PERSONAL BEST LAP" : "LAP COMPLETED",
-        "info",
-        formatLapDelta(d.currentLapMs, d.bestLapMs),
-      );
-      d.currentLapMs = 0;
-    }
 
     d.rpm = drift(d.rpm, 5200 + 5600 * throttle * style.pace, 0.42, 55);
     d.engineTempC = drift(
