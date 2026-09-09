@@ -25,7 +25,7 @@ export const DEFAULT_TICK_MS = 700;
 const TIME_SCALE = 6;
 const BASE_LAP_SECONDS = 83;
 /** Mean speed the corner model actually produces, so a lap lands near BASE_LAP_SECONDS. */
-const AVERAGE_SPEED_KMH = 239;
+const AVERAGE_SPEED_KMH = 237;
 
 /**
  * Motion is integrated in smaller steps than the tick. Speed depends on track
