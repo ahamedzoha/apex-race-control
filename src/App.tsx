@@ -1,3 +1,4 @@
+import { CarDiagram } from "./components/CarDiagram";
 import { DriverSwitcher } from "./components/DriverSwitcher";
 import { RaceStatus } from "./components/RaceStatus";
 import { TrackMap } from "./components/TrackMap";
@@ -36,6 +37,7 @@ export default function App() {
           <RaceStatus />
           <TrackMap />
         </div>
+        <CarDiagram />
       </main>
     </div>
   );
