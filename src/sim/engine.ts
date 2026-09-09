@@ -34,7 +34,7 @@ const AVERAGE_SPEED_KMH = 239;
  * at exactly 84.000s whatever their pace.
  */
 const MOTION_SUBSTEPS = 4;
-const SPEED_RESPONSE = 0.34;
+const SPEED_RESPONSE = 0.6;
 const SPEED_SUBSTEP_RESPONSE =
   1 - Math.pow(1 - SPEED_RESPONSE, 1 / MOTION_SUBSTEPS);
 const HISTORY_POINTS = 60;
