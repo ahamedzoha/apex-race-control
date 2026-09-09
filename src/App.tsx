@@ -1,5 +1,6 @@
 import { DriverSwitcher } from "./components/DriverSwitcher";
 import { RaceStatus } from "./components/RaceStatus";
+import { TrackMap } from "./components/TrackMap";
 import { useRace } from "./state/RaceContext";
 
 function SessionClock() {
@@ -31,7 +32,10 @@ export default function App() {
       </header>
 
       <main className="grid gap-3 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1fr)]">
-        <RaceStatus />
+        <div className="flex flex-col gap-3">
+          <RaceStatus />
+          <TrackMap />
+        </div>
       </main>
     </div>
   );
