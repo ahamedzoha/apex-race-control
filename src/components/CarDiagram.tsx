@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LIMITS } from "../sim/events";
 import type { TyreCorner } from "../sim/types";
 import { useRace } from "../state/RaceContext";
@@ -36,13 +36,37 @@ function tyreTone(tempC: number) {
 
 export function CarDiagram() {
   const [selected, setSelected] = useState<TyreCorner | null>(null);
-  const [hovered, setHovered] = useState<TyreCorner | null>(null);
-  const [focused, setFocused] = useState<TyreCorner | null>(null);
+  const [preview, setPreview] = useState<TyreCorner | null>(null);
 
-  const active = hovered ?? focused ?? selected;
+  // Pointer and keyboard both preview a corner, and the selection is what survives
+  // once they move away. Two states, not three: hovering and focusing mean the same
+  // thing here, and only the focus ring has to tell them apart.
+  const active = preview ?? selected;
 
   const toggle = (corner: TyreCorner) =>
     setSelected((current) => (current === corner ? null : corner));
+
+  const carRef = useRef<HTMLDivElement>(null);
+
+  // A pinned tyre has to be dismissable from anywhere, not only from the tyre that
+  // still holds focus. The listeners only exist while something is pinned.
+  useEffect(() => {
+    if (!selected) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelected(null);
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      if (!carRef.current?.contains(event.target as Node)) setSelected(null);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [selected]);
 
   const tempC = useRace((s) => (active ? s.driver.tyres[active].tempC : null));
   const pressureBar = useRace((s) =>
@@ -54,7 +78,10 @@ export function CarDiagram() {
 
   return (
     <Panel title="Car">
-      <div className="relative mx-auto aspect-[800/1836] w-full max-w-[220px]">
+      <div
+        ref={carRef}
+        className="relative mx-auto aspect-[800/1836] w-full max-w-[220px]"
+      >
         <img
           src="/assets/f1-car.png"
           alt="Top-down view of the car"
@@ -64,11 +91,10 @@ export function CarDiagram() {
         <svg
           viewBox="0 0 800 1836"
           className="absolute inset-0 h-full w-full"
-          onMouseLeave={() => setHovered(null)}
+          onMouseLeave={() => setPreview(null)}
         >
           {TYRE_REGIONS.map(({ corner, x, y, width, height }) => {
             const isActive = corner === active;
-            const isFocused = corner === focused;
             return (
               <rect
                 key={corner}
@@ -77,7 +103,7 @@ export function CarDiagram() {
                 width={width}
                 height={height}
                 rx="24"
-                className="cursor-pointer"
+                className="cursor-pointer focus-visible:[stroke-dasharray:10_8] focus-visible:[stroke:var(--color-apex)]"
                 role="button"
                 tabIndex={0}
                 aria-label={`${CORNER_NAME[corner]} tyre`}
@@ -85,19 +111,16 @@ export function CarDiagram() {
                 fill={isActive ? "var(--color-apex)" : "transparent"}
                 fillOpacity={isActive ? 0.22 : 0}
                 stroke={
-                  isActive || isFocused
+                  isActive
                     ? "var(--color-apex)"
                     : SHOW_HIT_REGIONS
                       ? "magenta"
                       : "none"
                 }
                 strokeWidth="4"
-                strokeDasharray={
-                  isFocused && selected !== corner ? "10 8" : undefined
-                }
-                onMouseEnter={() => setHovered(corner)}
-                onFocus={() => setFocused(corner)}
-                onBlur={() => setFocused(null)}
+                onMouseEnter={() => setPreview(corner)}
+                onFocus={() => setPreview(corner)}
+                onBlur={() => setPreview(null)}
                 onClick={() => toggle(corner)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
