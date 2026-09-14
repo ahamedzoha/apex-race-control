@@ -1,4 +1,5 @@
 import { CarDiagram } from "./components/CarDiagram";
+import { CarTelemetry } from "./components/CarTelemetry";
 import { DriverSwitcher } from "./components/DriverSwitcher";
 import { DriverVitals } from "./components/DriverVitals";
 import { RaceStatus } from "./components/RaceStatus";
@@ -38,7 +39,10 @@ export default function App() {
           <RaceStatus />
           <TrackMap />
         </div>
-        <CarDiagram />
+        <div className="flex flex-col gap-3">
+          <CarDiagram />
+          <CarTelemetry />
+        </div>
         <DriverVitals />
       </main>
     </div>
