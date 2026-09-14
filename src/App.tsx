@@ -1,5 +1,6 @@
 import { CarDiagram } from "./components/CarDiagram";
 import { DriverSwitcher } from "./components/DriverSwitcher";
+import { DriverVitals } from "./components/DriverVitals";
 import { RaceStatus } from "./components/RaceStatus";
 import { TrackMap } from "./components/TrackMap";
 import { useRace } from "./state/RaceContext";
@@ -38,6 +39,7 @@ export default function App() {
           <TrackMap />
         </div>
         <CarDiagram />
+        <DriverVitals />
       </main>
     </div>
   );

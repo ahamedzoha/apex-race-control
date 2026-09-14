@@ -461,7 +461,14 @@ export function createRaceEngine(tickMs = DEFAULT_TICK_MS): RaceEngine {
       driver: selected.telemetry,
       roster: drivers.map((d) => d.telemetry),
       markers,
-      history: selected.history,
+      // History buffers are mutated in place by pushPoint, so the snapshot takes a
+      // copy. Without it the arrays keep the same identity every tick and nothing
+      // reading them ever re-renders.
+      history: {
+        heartRate: [...selected.history.heartRate],
+        breathing: [...selected.history.breathing],
+        stress: [...selected.history.stress],
+      },
       weather,
       events,
     };
