@@ -2,8 +2,10 @@ import { CarDiagram } from "./components/CarDiagram";
 import { CarTelemetry } from "./components/CarTelemetry";
 import { DriverSwitcher } from "./components/DriverSwitcher";
 import { DriverVitals } from "./components/DriverVitals";
+import { EventFeed } from "./components/EventFeed";
 import { RaceStatus } from "./components/RaceStatus";
 import { TrackMap } from "./components/TrackMap";
+import { Weather } from "./components/Weather";
 import { useRace } from "./state/RaceContext";
 
 function SessionClock() {
@@ -38,12 +40,16 @@ export default function App() {
         <div className="flex flex-col gap-3">
           <RaceStatus />
           <TrackMap />
+          <Weather />
         </div>
         <div className="flex flex-col gap-3">
           <CarDiagram />
           <CarTelemetry />
         </div>
-        <DriverVitals />
+        <div className="flex flex-col gap-3">
+          <DriverVitals />
+          <EventFeed />
+        </div>
       </main>
     </div>
   );
