@@ -5,6 +5,10 @@ simulated in the browser. There is no backend and no network calls.
 
 Live: https://apex-race-control.vercel.app/
 
+[![The dashboard at desktop width, with the front left tyre selected](docs/preview.png)](https://youtu.be/D3z7ruE-GEs)
+
+Walkthrough video: https://youtu.be/D3z7ruE-GEs
+
 ## 1. How to run
 
 ```sh
