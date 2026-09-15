@@ -3,6 +3,8 @@
 A live race control screen for a Formula 1 race engineer. Everything on it is
 simulated in the browser. There is no backend and no network calls.
 
+Live: https://apex-race-control.vercel.app/
+
 ## 1. How to run
 
 ```sh
