@@ -80,7 +80,10 @@ export function CarDiagram() {
     <Panel title="Car">
       <div
         ref={carRef}
-        className="relative mx-auto aspect-[800/1836] w-full max-w-[220px]"
+        /* The art is nearly 1:2.3, so sizing by width makes it tower over the
+             panel and push the telemetry below the fold. Height drives it, and the
+             aspect ratio works the width out. */
+        className="relative mx-auto aspect-[800/1836] h-[clamp(240px,42vh,440px)]"
       >
         <img
           src="/assets/f1-car.png"

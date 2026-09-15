@@ -21,7 +21,7 @@ export function Panel({
         <h2 className="label">{title}</h2>
         {accessory}
       </header>
-      <div className="flex-1 p-3">{children}</div>
+      <div className="min-h-0 flex-1 p-3">{children}</div>
     </section>
   );
 }

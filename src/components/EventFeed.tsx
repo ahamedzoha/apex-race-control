@@ -25,7 +25,7 @@ export function EventFeed() {
       {visible.length === 0 ? (
         <p className="text-xs text-ink-faint">Waiting for the first event.</p>
       ) : (
-        <ul className="flex max-h-64 flex-col gap-1.5 overflow-y-auto pr-1 lg:max-h-[22rem]">
+        <ul className="flex max-h-64 flex-col gap-1.5 overflow-y-auto pr-1 lg:h-full lg:max-h-none">
           {visible.map((event) => {
             const style = SEVERITY_STYLE[event.severity];
             return (
