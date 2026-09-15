@@ -25,11 +25,7 @@ export function EventFeed({ className }: { className?: string }) {
       {visible.length === 0 ? (
         <p className="text-xs text-ink-faint">Waiting for the first event.</p>
       ) : (
-        <ul /* Bounded against the viewport, not the parent: a percentage height inside
-                 a content-sized grid row resolves to auto, and the list then grows the
-                 page instead of scrolling. */
-          className="flex max-h-64 flex-col gap-1.5 overflow-y-auto pr-1 lg:max-h-96 xl:max-h-none xl:h-full"
-        >
+        <ul className="flex max-h-64 flex-col gap-1.5 overflow-y-auto pr-1 lg:max-h-96 xl:max-h-none xl:h-full">
           {visible.map((event) => {
             const style = SEVERITY_STYLE[event.severity];
             return (
