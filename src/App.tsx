@@ -21,8 +21,8 @@ export default function App() {
   const driverNumber = useRace((s) => s.driver.number);
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-10 border-b border-edge bg-ground/95 backdrop-blur">
+    <div className="flex min-h-screen flex-col xl:h-screen xl:overflow-hidden">
+      <header className="sticky top-0 z-10 shrink-0 border-b border-edge bg-ground/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-[1760px] flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2.5 md:px-4">
           <img
             src="/assets/apex-racing-mark.svg"
@@ -43,19 +43,19 @@ export default function App() {
       {/* Hierarchy changes per tier rather than the desktop layout shrinking:
           the car leads on a phone because it is the thing you touch, three
           columns only appear once there is room for all of them side by side. */}
-      <main className="mx-auto grid w-full max-w-[1760px] gap-3 p-3 md:p-4 lg:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)_minmax(0,1fr)]">
-        <div className="order-1 flex min-w-0 flex-col gap-3 lg:order-2">
+      <main className="mx-auto grid w-full max-w-[1760px] gap-3 p-3 md:p-4 lg:grid-cols-2 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)_minmax(0,1fr)]">
+        <div className="order-1 flex min-w-0 flex-col gap-3 lg:order-2 xl:min-h-0">
           <CarDiagram />
           <CarTelemetry />
         </div>
-        <div className="order-2 flex min-w-0 flex-col gap-3 lg:order-1">
+        <div className="order-2 flex min-w-0 flex-col gap-3 lg:order-1 xl:min-h-0">
           <RaceStatus />
           <TrackMap />
           <Weather />
         </div>
-        <div className="order-3 grid min-w-0 gap-3 lg:col-span-2 lg:grid-cols-2 xl:col-span-1 xl:grid-cols-1">
+        <div className="order-3 grid min-w-0 gap-3 lg:col-span-2 lg:grid-cols-2 xl:col-span-1 xl:flex xl:min-h-0 xl:flex-col">
           <DriverVitals />
-          <EventFeed />
+          <EventFeed className="xl:min-h-0 xl:flex-1" />
         </div>
       </main>
     </div>

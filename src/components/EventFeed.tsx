@@ -8,7 +8,7 @@ const SEVERITY_STYLE: Record<Severity, { bar: string; text: string }> = {
   critical: { bar: "bg-critical", text: "text-critical" },
 };
 
-export function EventFeed() {
+export function EventFeed({ className }: { className?: string }) {
   const events = useRace((s) => s.events);
   const selectedDriverId = useRace((s) => s.selectedDriverId);
 
@@ -21,11 +21,15 @@ export function EventFeed() {
     .slice(0, 20);
 
   return (
-    <Panel title="Race control">
+    <Panel title="Race control" className={className}>
       {visible.length === 0 ? (
         <p className="text-xs text-ink-faint">Waiting for the first event.</p>
       ) : (
-        <ul className="flex max-h-64 flex-col gap-1.5 overflow-y-auto pr-1 lg:h-full lg:max-h-none">
+        <ul /* Bounded against the viewport, not the parent: a percentage height inside
+                 a content-sized grid row resolves to auto, and the list then grows the
+                 page instead of scrolling. */
+          className="flex max-h-64 flex-col gap-1.5 overflow-y-auto pr-1 lg:max-h-96 xl:max-h-none xl:h-full"
+        >
           {visible.map((event) => {
             const style = SEVERITY_STYLE[event.severity];
             return (
