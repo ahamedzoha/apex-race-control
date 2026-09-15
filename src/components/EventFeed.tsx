@@ -18,14 +18,14 @@ export function EventFeed() {
     .filter(
       (event) => event.driverId === "" || event.driverId === selectedDriverId,
     )
-    .slice(0, 12);
+    .slice(0, 20);
 
   return (
     <Panel title="Race control">
       {visible.length === 0 ? (
         <p className="text-xs text-ink-faint">Waiting for the first event.</p>
       ) : (
-        <ul className="flex flex-col gap-1.5">
+        <ul className="flex max-h-64 flex-col gap-1.5 overflow-y-auto pr-1 lg:max-h-[22rem]">
           {visible.map((event) => {
             const style = SEVERITY_STYLE[event.severity];
             return (
@@ -36,7 +36,9 @@ export function EventFeed() {
                     {event.label}
                   </p>
                   <p className="tabular font-mono text-[10px] text-ink-faint">
-                    {event.clock} · lap {event.lap || "—"}
+                    {/* Session-wide events belong to the race, not to a lap. */}
+                    {event.clock}
+                    {event.lap ? ` · lap ${event.lap}` : ""}
                     {event.detail ? ` · ${event.detail}` : ""}
                   </p>
                 </div>
