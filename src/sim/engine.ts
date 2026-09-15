@@ -38,7 +38,8 @@ const SPEED_RESPONSE = 0.6;
 const SPEED_SUBSTEP_RESPONSE =
   1 - Math.pow(1 - SPEED_RESPONSE, 1 / MOTION_SUBSTEPS);
 const HISTORY_POINTS = 60;
-const EVENT_LIMIT = 40;
+/** Shared across all drivers plus session-wide events, so it has to hold a few laps for each. */
+const EVENT_LIMIT = 120;
 const SESSION_START_SECONDS = 10 * 3600 + 15 * 60;
 
 const CORNERS: TyreCorner[] = ["fl", "fr", "rl", "rr"];
